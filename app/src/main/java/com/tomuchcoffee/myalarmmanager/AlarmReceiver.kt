@@ -7,7 +7,6 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.icu.number.IntegerWidth
 import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
@@ -43,13 +42,52 @@ class AlarmReceiver : BroadcastReceiver() {
         val notifId =
             if (type.equals(TYPE_ONE_TIME, ignoreCase = true)) ID_ONETIME else ID_REPEATING
 
-        showToast(context, title, message)
+//        showToast(context, title, message)
 
         if (message != null){
             showAlarmNotification(context,title, message, notifId)
         }
 
     }
+
+    private fun showAlarmNotification(context: Context, title: String, message: String, notifId: Int){
+        val channelId = "Channel_1"
+        val channelName = "AlarmManager channel"
+
+        val notificationManagerCompat = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+        val builder = NotificationCompat.Builder(context, channelId)
+            .setSmallIcon(R.drawable.ic_baseline_access_time_24)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setColor(ContextCompat.getColor(context, android.R.color.transparent))
+            .setVibrate(longArrayOf(1000, 1000, 1000, 1000, 1000))
+            .setSound(alarmSound)
+
+        /*
+        Untuk android Oreo ke atas perlu menambahkan notification channel
+        Materi ini akan dibahas lebih lanjut di modul extended
+         */
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+            /* Create or update. */
+            val channel = NotificationChannel(channelId,
+                channelName,
+                NotificationManager.IMPORTANCE_DEFAULT)
+
+            channel.enableVibration(true)
+            channel.vibrationPattern = longArrayOf(1000, 1000, 1000, 1000, 1000)
+
+            builder.setChannelId(channelId)
+
+            notificationManagerCompat.createNotificationChannel(channel)
+        }
+
+        val notification = builder.build()
+
+        notificationManagerCompat.notify(notifId, notification)
+    }
+
 
     private fun showToast(context: Context, title: String, message: String?) {
         Toast.makeText(context, "$title : $message", Toast.LENGTH_SHORT).show()
@@ -99,26 +137,4 @@ class AlarmReceiver : BroadcastReceiver() {
         }
     }
 
-    private fun showAlarmNotification(context: Context, title: String, message: String, notifId: Int){
-        val channelId = "Channel_1"
-        val channelName = "AlarmManager channel"
-
-        val notificationManagerCompat = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        val builder = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(R.drawable.ic_baseline_access_time_24)
-            .setContentTitle(title)
-            .setContentText(message)
-            .setColor(ContextCompat.getColor(context, android.R.color.transparent))
-            .setVibrate(longArrayOf(1000, 1000, 1000, 1000, 1000))
-            .setSound(alarmSound)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            val channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT)
-            builder.setChannelId(channelId)
-            notificationManagerCompat.createNotificationChannel(channel)
-        }
-        val notification = builder.build()
-        notificationManagerCompat.notify(notifId, notification)
-    }
 }

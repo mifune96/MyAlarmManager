@@ -1,4 +1,4 @@
-package com.tomuchcoffee.myalarmmanager
+package com.tomuchcoffee.myalarmmanager.utils
 
 import android.app.DatePickerDialog
 import android.app.Dialog

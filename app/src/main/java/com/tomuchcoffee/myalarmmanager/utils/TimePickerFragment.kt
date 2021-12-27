@@ -1,4 +1,4 @@
-package com.tomuchcoffee.myalarmmanager
+package com.tomuchcoffee.myalarmmanager.utils
 
 import android.app.Dialog
 import android.app.TimePickerDialog
@@ -14,7 +14,7 @@ class TimePickerFragment : DialogFragment(), TimePickerDialog.OnTimeSetListener 
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        mListener = context as DialogTimeListener
+        mListener = context as DialogTimeListener?
     }
 
     override fun onDetach() {
